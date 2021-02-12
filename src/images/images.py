@@ -2,12 +2,20 @@ import cv2
 from utils.utils import get_numbers_from_string
 
 
-def crop_image(input_path :str, output_path :str):
+def crop_image_from_path(input_path :str):
     im = cv2.imread(input_path, cv2.IMREAD_COLOR)
-    number = get_numbers_from_string(input_path)[-1]
+    return crop_image_from_object(im)
 
-    logo_cropped = crop(im, 790, 900, 925, 1020)
+def crop_image_from_object(im):
+    logo_cropped = crop(im, 810, 920, 910, 1001)
     feed_cropped = crop(im, 100, 1300, 300, 1880)
+
+    return logo_cropped, feed_cropped
+
+
+def crop_and_save_image(input_path :str, output_path :str):
+    number = get_numbers_from_string(input_path)[-1]
+    logo_cropped, feed_cropped = crop_image_from_path(input_path)
 
     cv2.imwrite(f"{output_path}/logo{number}.jpg", logo_cropped)
     cv2.imwrite(f"{output_path}/killfeed{number}.jpg", feed_cropped)
