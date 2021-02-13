@@ -19,7 +19,6 @@ async def split(start :int, end :int, name : str, path: str):
 def trim_video_from_tasks(tasks):
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.gather(*tasks))
-    loop.close()
 
 def create_tasks_from_videos_objects(videos_objects):
     tasks = []
