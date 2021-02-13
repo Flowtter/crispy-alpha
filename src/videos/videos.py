@@ -79,6 +79,5 @@ def post_process_videos_objects(videos_objects):
 def remove_overlap_videos_objects(video_obj1 : video_object, video_obj2 : video_object):    
     if video_obj1.end > video_obj2.start:
         overlap_time = video_obj1.end - video_obj2.start
-        print(overlap_time, overlap_time%2)
         video_obj1.end -= (overlap_time//2 + 1)
         video_obj2.start += (overlap_time//2 - 1 + overlap_time%2)

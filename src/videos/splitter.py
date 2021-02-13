@@ -7,11 +7,11 @@ cwd = os.getcwd()
 async def split(start :int, end :int, name : str, path: str):
     proc = await asyncio.create_subprocess_exec(
         "ffmpeg", "-y",
-        "-i", f"{cwd}/tmp/videos/output.mp4",
+        "-i", f"{cwd}/tmp/videos/main.mp4",
         "-vf", f"trim=start={start}:end={end},setpts=PTS-STARTPTS",
         "-af", f"atrim=start={start}:end={end},asetpts=PTS-STARTPTS",
         f"{path}{name}.mp4",
-        "-loglevel", "quiet",
+        "-loglevel", "error",
         "-stats"
     )
     returncode = await proc.wait()
