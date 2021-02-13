@@ -14,3 +14,24 @@ def draw_template(image, template):
         cv2.rectangle(image, (point[0] - 2, point[1] - 2),
                           (point[0] + width + 2, point[1] + height + 2),
                           (200,200,200), 2)
+
+def post_process_frames_with_template(frames):
+    result = []
+    sub_result = []
+    last = 0
+
+    for i in range(len(frames)):
+        if last + 1 == frames[i] or last == 0:
+            sub_result.append(frames[i])
+        else:
+            result.append(sub_result)
+            sub_result = [frames[i]]
+        last = frames[i]
+    result.append(sub_result)
+    return result
+
+def post_process_frames_in_tuples(frames_processed):
+    result = []
+    for clip in frames_processed:
+        result.append((clip[0], len(clip)))
+    return result
