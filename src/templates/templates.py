@@ -2,6 +2,8 @@ import cv2
 import numpy as np
 import pytesseract
 
+pytesseract.pytesseract.tesseract_cmd = "C:\Program Files\Tesseract-OCR\\tesseract.exe"
+
 def find_template(image, template):
     res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
 
@@ -18,4 +20,15 @@ def draw_template(image, template):
                           (200,200,200), 2)
 
 
-def find_pseudo()
+def find_pseudo(img, pseudo: str):
+    res = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
+    kill = False
+    names = res['text']
+    for i in range(0, len(names) - 1, 2):
+        if names[i] == "":
+            continue
+        # print('killer:', names[i], 'killed:', names[i+1])
+        if names[i] == pseudo:
+            # print('\n\n', pseudo, 'made the kill\n\n')
+            kill = True
+    return kill
