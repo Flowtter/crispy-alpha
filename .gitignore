@@ -6,3 +6,5 @@ venv/
 .vscode/
 
 tmp/
+
+*.mp4

@@ -44,3 +44,4 @@ def extract_images_and_crop_them(input_path: str, rate: int):
 
     vidcap.release()
     return result
+    
