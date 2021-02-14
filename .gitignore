@@ -11,3 +11,10 @@ tmp/
 *.mp4
 *.mp3
 *.wav
+
+resources/audio/
+!resources/audio/.gitkeep
+resources/videos/
+!resources/videos/.gitkeep
+
+output/

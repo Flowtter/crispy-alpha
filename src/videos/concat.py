@@ -25,7 +25,6 @@ def create_log_file_of_videos(path):
                 f.write("file " + video+"\n")
 
 def concat_videos_from_directory(path, path_out_and_name):
-    print(path + "videos.log")
     tasks = [asyncio.ensure_future(concat(path + "videos.log", path_out_and_name))]
     loop = asyncio.get_event_loop()
     loop.run_until_complete(asyncio.gather(*tasks))
