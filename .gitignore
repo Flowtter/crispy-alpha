@@ -12,6 +12,8 @@ tmp/
 *.mp3
 *.wav
 
+stats.log
+
 resources/audio/
 !resources/audio/.gitkeep
 resources/videos/

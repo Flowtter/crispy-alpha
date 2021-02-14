@@ -1,19 +1,34 @@
 import asyncio
 from utils.utils import *
+from utils.arguments import *
 
 cwd = os.getcwd()
 
 async def concat(path: str, path_out_and_name : str):
-    proc = await asyncio.create_subprocess_exec(
-        "ffmpeg", "-y",
-        "-f", "concat",
-        "-safe", "0",
-        "-i",  cwd + "/" + path,
-        "-c", "copy",
-        path_out_and_name,
-        "-loglevel", "error",
-        "-stats"
+    if args.debug:
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg", "-y",
+            "-f", "concat",
+            "-safe", "0",
+            "-i",  cwd + "/" + path,
+            "-r", "60",
+            "-c", "copy",
+            path_out_and_name,
+            "-loglevel", "error",
+            "-stats"
     )
+    else:
+        proc = await asyncio.create_subprocess_exec(
+            "ffmpeg", "-y",
+            "-f", "concat",
+            "-safe", "0",
+            "-i",  cwd + "/" + path,
+            "-r", "60",
+            "-c", "copy",
+            path_out_and_name,
+            "-loglevel", "quiet"
+        )
+
     returncode = await proc.wait()
 
 

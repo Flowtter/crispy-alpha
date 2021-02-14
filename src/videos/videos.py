@@ -31,7 +31,7 @@ def extract_images_and_save_from_video(input_path: str, output_path: str, rate: 
 
 def extract_images_and_crop_them(input_path: str, rate: int):
     resultLogo = []
-    resultFeed = []
+    #resultFeed = []
 
     vidcap = cv2.VideoCapture(input_path)
     count = 0
@@ -48,11 +48,11 @@ def extract_images_and_crop_them(input_path: str, rate: int):
             success, image = vidcap.read()
             tmp = crop_image_from_object(image)
             resultLogo.append(tmp[0])
-            resultFeed.append(tmp[1])
+            #resultFeed.append(tmp[1])
         count += 1
 
     vidcap.release()
-    return resultLogo, resultFeed
+    return resultLogo, True #resultFeed
     
 
 
@@ -64,7 +64,7 @@ def create_video_object_from_frames_processed(tuples_processed, offset_start, of
         if starting < 0: 
             starting = 0
         if ending > video_size_in_frame:
-            ending = video_size_in_frame - 2
+            ending = video_size_in_frame
         
         videos_objects.append(video_object(starting, ending, name + str(i)))
     return videos_objects

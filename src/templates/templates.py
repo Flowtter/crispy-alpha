@@ -5,7 +5,7 @@ def find_template(image, template):
     res = cv2.matchTemplate(image, template, cv2.TM_CCOEFF_NORMED)
 
     min_val, max_val, _, _ = cv2.minMaxLoc(res)
-    return max_val > 0.80
+    return max_val > 0.60
     # return np.where(res > 0.80)
 
 def draw_template(image, template):

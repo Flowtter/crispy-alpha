@@ -49,3 +49,9 @@ def rm_rec(path: str):
             os.rmdir(f.path)
         else:
             os.remove(f.path)
+
+def concat_args(*argv):
+    result = ""
+    for arg in argv: 
+        result += str(arg) + " "
+    return result

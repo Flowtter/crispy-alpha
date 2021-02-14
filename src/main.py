@@ -1,8 +1,11 @@
 import cv2
 import os
 import moviepy.editor as mpe
+from moviepy.editor import VideoFileClip, concatenate_videoclips
 import asyncio
 import sys
+
+import progressbar
 
 from videos.videos import *
 from videos.splitter import *
@@ -12,68 +15,106 @@ from images.images import *
 from templates.templates import *
 from utils.paths import *
 from utils.utils import *
-
+from utils.arguments import *
 
 musics = get_all_files_and_folder_from_path_keep_extension(RESOURCES_MUSICS_PATH, ".wav")
 videos = get_all_files_and_folder_from_path_keep_extension(RESOURCES_VIDEOS_PATH, ".mp4")
 
-print(musics, videos)
+print("Thanks for using crispy !\nTo create a video, simply put mp4 files in resources/videos and a wav file in resources/audio\nCreating a video could take several minutes")
 
-for video in videos:
+if len(videos) == 0:
+    print("Add videos in .mp4 in resources/videos and a music in resources/audio")
+    exit()
+
+logging.info(concat_args(musics, videos))
+
+
+bar = progressbar.ProgressBar(max_value=len(videos))
+
+for i, video in enumerate(videos):
+    bar.update(i)
     create_directories()
 
-    print(video)
-    print("Getting images")
+    logging.info(concat_args("Editing", video))
+    logging.debug("Getting images")
+
     images, _ = extract_images_and_crop_them(RESOURCES_VIDEOS_PATH + video, 1)
-    print("Searching for templates")
+    logging.debug("Searching for templates")
+
     template_im = cv2.imread("assets/template.jpg")
     frames_template = find_template_in_images(images, template_im, False)
-    print("Frames templates:", frames_template)
-    print("Post processing templates")
+
+    if frames_template == []:
+        print(f"No kill found in {video}, double check the video or increase the quality")
+        continue
+
+    logging.info(concat_args("Frames templates:", frames_template))
+    logging.debug("Post processing templates")
+
     frames_processed = post_process_frames_with_template(frames_template)
     tuples_processed = post_process_frames_in_tuples(frames_processed)
-    print("Tuple processed:", tuples_processed)
-    print("Creating videos objects")
-    videos_objects = create_video_object_from_frames_processed(tuples_processed, 2, 3, 75, "test")
-    print("post processing videos")
+    logging.debug(concat_args("Tuple processed:", tuples_processed))
+    logging.debug("Creating videos objects")
+
+    videos_objects = create_video_object_from_frames_processed(tuples_processed, 2, 1, len(images), "test")
+    logging.debug("post processing videos")
+
     post_process_videos_objects(videos_objects)
-    print("Creating tasks")
-    tasks = create_tasks_from_videos_objects(videos_objects, VIDEOS_PATH, RESOURCES_VIDEOS_PATH + "main") # refactor
-    print("Trimming video")
+    logging.debug("Creating tasks")
+    tasks = create_tasks_from_videos_objects(videos_objects, VIDEOS_PATH, RESOURCES_VIDEOS_PATH + video)
+
+    logging.debug("Trimming video")
     trim_video_from_tasks(tasks)
-    print("Creating LOG file")
+
+    logging.debug("Creating LOG file")
     create_log_file_of_videos(VIDEOS_PATH)
-    print("Concat videos")
+    logging.debug("Concat videos")
     concat_videos_from_directory(VIDEOS_PATH, OUTPUT + "/concat_video_" + video) # refactor
 
     clear_directories(".tmp")
 
+bar.finish()
 
+bar = progressbar.ProgressBar(max_value=4)
 
-print("Creating FINAL LOG file")
-create_log_file_of_videos(OUTPUT)
-print("Concat FINAL videos")
-concat_videos_from_directory(OUTPUT, "export.mp4") #refactor
+logging.info("Concat FINAL videos")
+cliparray = []
+for filename in os.listdir(OUTPUT):
+    cliparray.append(VideoFileClip(OUTPUT + filename))
+    
+bar.update(1)
+
+final_clip = concatenate_videoclips(cliparray)
+
+bar.update(2)
+
 if len(musics) > 0:
-    print("Loading video")
-    my_clip = mpe.VideoFileClip("export.mp4")
-    print("Loading audio")
     audio_background = mpe.AudioFileClip(RESOURCES_MUSICS_PATH + musics[0])
-    print("Edition audio")
-    final_audio = mpe.CompositeAudioClip([my_clip.audio, audio_background])
-    final_audio = final_audio.subclip(0, my_clip.duration)
-    my_clip.audio = final_audio
-    print("Writing video")
-    my_clip.write_videofile("export_with_music.mp4")
-    print("Removing old video")
-    os.remove("export.mp4")
+    logging.debug("Edition audio")
+    final_audio = mpe.CompositeAudioClip([final_clip.audio, audio_background])
+    final_audio = final_audio.subclip(0, final_clip.duration)
+    final_clip.audio = final_audio
+    bar.update(3)
+    logging.debug("Writing video")
+    sys.stdout = open("stats.log", 'w')
+    final_clip.write_videofile("export_with_music.mp4", verbose=False, logger=None)
+    sys.stdout.close()
+else:
+    sys.stdout = open("stats.log", 'w')
+    final_clip.write_videofile("export.mp4", verbose=False, logger=None)
+    sys.stdout.close()
 
-print("Removing output folder")
-clear_directories(OUTPUT)
+
+bar.finish()
 
 
-print("Closing loop")
+if not args.keep:
+    logging.debug("Removing output folder")
+    clear_directories(OUTPUT)
+
+
+logging.debug("Closing loop")
 loop = asyncio.get_event_loop()
 loop.close()
 
-#clear_directories()
+logging.info("Done")
