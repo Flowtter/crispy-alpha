@@ -7,7 +7,7 @@ cwd = os.getcwd()
 async def split(start :int, end :int, name : str, path: str):
     proc = await asyncio.create_subprocess_exec(
         "ffmpeg", "-y",
-        "-i", f"{cwd}/tmp/videos/main.mp4",
+        "-i", f"{cwd}/.tmp/videos/main.mp4",
         "-vf", f"trim=start={start}:end={end},setpts=PTS-STARTPTS",
         "-af", f"atrim=start={start}:end={end},asetpts=PTS-STARTPTS",
         f"{path}{name}.mp4",
@@ -28,4 +28,4 @@ def create_tasks_from_videos_objects(videos_objects):
     
 
 def create_task(video_obj :video_object):
-    return asyncio.ensure_future(split(video_obj.start, video_obj.end, video_obj.name, "tmp/videos/output/"))
+    return asyncio.ensure_future(split(video_obj.start, video_obj.end, video_obj.name, ".tmp/videos/output/"))

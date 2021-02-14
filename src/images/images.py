@@ -29,7 +29,7 @@ def crop(image, x, y, width, height):
 def find_template_in_images(images, template, write=False):
     result = []
     if write:
-        f = open("tmp/kill.log", 'w')
+        f = open(".tmp/kill.log", 'w')
 
     for i in range(len(images)):
         if find_template(images[i], template):
